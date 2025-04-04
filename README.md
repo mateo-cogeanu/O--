@@ -6,7 +6,7 @@ Run code with
 python interpreter.py FILE.omm
 ```
 
-## Basics
+# Basics
 To print in `O--` all you need to do is
 
 ```rs
@@ -18,7 +18,7 @@ And the output is
 hello, world!
 ```
 
-# Variables
+## Variables
 Variables are VERY easy all you need to do is
 
 ```rs
@@ -27,7 +27,7 @@ x = 1
 
 Thats it!
 
-# Math
+## Math
 Math is also very easy
 
 ```rs
@@ -36,7 +36,7 @@ p x + 1
 ```
 other symbols work aswell `+,-,/`
 
-# If statement's
+## If statement's
 these are very easy
 
 ```rs
@@ -44,7 +44,7 @@ x = 6
 i x > 5 { p "x is greater than 5" }
 ```
 
-# Loops
+## Loops
 Loops are simple
 
 ```rs
@@ -59,7 +59,7 @@ l 999999999999999999 { "infinite loop?" }
 
 just shove alot of 9's there
 
-# EXIT
+## EXIT
 ```rs
 e
 ```

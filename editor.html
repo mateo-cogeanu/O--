@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>O-- IDE</title>
+  <style>
+    body {
+      margin: 0;
+      background: #1e1e1e;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #toolbar {
+      background: #252526;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    #filenameInput {
+      background: #1e1e1e;
+      color: white;
+      border: 1px solid #3c3c3c;
+      padding: 6px 10px;
+      border-radius: 3px;
+      font-size: 14px;
+      width: 200px;
+    }
+
+    #filenameInput:focus {
+      outline: none;
+      border-color: #007acc;
+    }
+
+    #saveBtn {
+      background-color: #0e639c;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      font-size: 14px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    #saveBtn:hover {
+      background-color: #1177bb;
+    }
+
+    #editor {
+      width: 100vw;
+      height: calc(100vh - 50px);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toolbar">
+    <input id="filenameInput" type="text" placeholder="Filename" value="code.omm" />
+    <button id="saveBtn">Save</button>
+  </div>
+
+  <div id="editor"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+  <script>
+    require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
+
+    require(['vs/editor/editor.main'], function () {
+      monaco.languages.register({ id: 'o--' });
+
+      monaco.languages.setMonarchTokensProvider('o--', {
+        tokenizer: {
+          root: [
+            [/\b(p|i|l|e)\b/, 'keyword'],
+            [/[+\-\/]/, 'operator'],
+            [/\".*?\"/, 'string'],
+            [/[a-zA-Z_][\w\-]*/, 'identifier'], // default fallback: purple
+          ]
+        }
+      });
+
+      monaco.editor.defineTheme('o--theme', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+          { token: 'keyword', foreground: '569CD6' },    // blue
+          { token: 'operator', foreground: 'FF4C4C' },    // red
+          { token: 'string', foreground: 'CE9178' },      // orange
+          { token: 'identifier', foreground: 'C586C0' },  // purple
+        ],
+        colors: {}
+      });
+
+      const editor = monaco.editor.create(document.getElementById('editor'), {
+        value: ``,
+        language: 'o--',
+        theme: 'o--theme',
+        automaticLayout: true
+      });
+
+      document.getElementById('saveBtn').addEventListener('click', () => {
+        let fileName = document.getElementById('filenameInput').value.trim();
+        if (!fileName.toLowerCase().endsWith('.omm')) {
+          fileName += '.omm';
+        }
+
+        const code = editor.getValue();
+        const blob = new Blob([code], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+    });
+  </script>
+</body>
+</html>

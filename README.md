@@ -44,6 +44,20 @@ x = 6
 i x > 5 { p "x is greater than 5" }
 ```
 
+### Functions
+functions are simple
+
+```rs
+f func { p "function" }
+func
+```
+
+output
+
+```rs
+function
+```
+
 ### Loops
 Loops are simple
 

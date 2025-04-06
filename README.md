@@ -73,6 +73,14 @@ l 999999999999999999 { "infinite loop?" }
 
 just shove alot of 9's there
 
+### Comments
+comments are `VERY` simple
+
+```rs
+c comment
+```
+inline comments are not possible yet
+
 ### EXIT
 ```rs
 e

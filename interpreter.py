@@ -44,6 +44,9 @@ def parse(tokens, variables):
         prompt = ' '.join(tokens[1:]).strip('"')
         return ('input', prompt)
     
+    elif tokens[0] == 'c':
+        return ('comment')
+    
     # Exit
     elif tokens[0] == 'e':
         return ('exit',)
@@ -120,6 +123,9 @@ def interpret(code, variables):
         # Exit
         elif action[0] == 'exit':
             sys.exit(0)
+            
+        elif action[0] == 'exit':
+            continue
         
         # List create
         elif action[0] == 'list_create':

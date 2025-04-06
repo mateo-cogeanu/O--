@@ -74,6 +74,7 @@
       monaco.languages.setMonarchTokensProvider('o--', {
         tokenizer: {
           root: [
+            [/^\s*c.*$/, 'comment'],
             [/\b(p|i|l|e|f)\b/, 'keyword'],
             [/[+\-\/=]/, 'operator'],
             [/\".*?\"/, 'string'],
@@ -81,6 +82,7 @@
             [/\b\d+(\.\d+)?\b/, 'number'],
             [/\{/, 'braceblock'],
             [/\}/, 'braceblock2'],
+
 
           ]
         }
@@ -90,6 +92,7 @@
         base: 'vs-dark',
         inherit: true,
         rules: [
+          { token: 'comment', foreground: '999595', fontStyle: 'italic' },
           { token: 'keyword', foreground: '569CD6' },    // blue
           { token: 'operator', foreground: 'FF4C4C' },    // red
           { token: 'string', foreground: 'CE9178' },      //orange
@@ -97,6 +100,7 @@
           { token: 'number', foreground: 'CE9178' },
           { token: 'braceblock', foreground: 'DCDCAA' },
           { token: 'braceblock2', foreground: 'DCDCAA' },
+   
 
         ],
         colors: {}

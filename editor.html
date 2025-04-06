@@ -75,9 +75,13 @@
         tokenizer: {
           root: [
             [/\b(p|i|l|e|f)\b/, 'keyword'],
-            [/[+\-\/]/, 'operator'],
+            [/[+\-\/=]/, 'operator'],
             [/\".*?\"/, 'string'],
-            [/[a-zA-Z_][\w\-]*/, 'identifier'], // default fallback: purple
+            [/[a-zA-Z_][\w\-]*/, 'identifier'],
+            [/\b\d+(\.\d+)?\b/, 'number'],
+            [/\{/, 'braceblock'],
+            [/\}/, 'braceblock2'],
+
           ]
         }
       });
@@ -88,8 +92,12 @@
         rules: [
           { token: 'keyword', foreground: '569CD6' },    // blue
           { token: 'operator', foreground: 'FF4C4C' },    // red
-          { token: 'string', foreground: 'CE9178' },      // orange
-          { token: 'identifier', foreground: 'C586C0' },  // purple
+          { token: 'string', foreground: 'CE9178' },      //orange
+          { token: 'identifier', foreground: 'C586C0' },
+          { token: 'number', foreground: 'CE9178' },
+          { token: 'braceblock', foreground: 'DCDCAA' },
+          { token: 'braceblock2', foreground: 'DCDCAA' },
+
         ],
         colors: {}
       });

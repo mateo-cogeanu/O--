@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import subprocess
 import time
 import re
 import sys
@@ -55,6 +56,9 @@ def parse(tokens, variables):
     # Exit
     elif tokens[0] == 'e':
         return ('exit',)
+    elif tokens[0] == 't':
+        cmd = ' '.join(tokens[1:])
+        return ('terminal', cmd)
     
     # List operations
     elif tokens[0] == 'a' and len(tokens) > 1 and tokens[1] == '=':
@@ -134,6 +138,19 @@ def interpret(code, variables):
 
         elif action[0] == 'wait':
             time.sleep(action[1]) 
+        
+        elif action[0] == 'terminal':
+            print(f"$ {action[1]}")  # Show the command being run
+            process = subprocess.Popen(
+                action[1],
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            )
+            for line in process.stdout:
+                print(line, end='')  # Print output in real-time
+            process.wait()
 
         # List create
         elif action[0] == 'list_create':

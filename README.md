@@ -82,6 +82,14 @@ l 999999999999999999 { "infinite loop?" }
 
 just shove alot of 9's there
 
+### Run Terminal Commands
+simple. as always
+
+```rs
+t python --version
+```
+`t` stands for TERMINAL
+
 ### Comments
 comments are `VERY` simple
 

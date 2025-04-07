@@ -58,6 +58,16 @@ output
 function
 ```
 
+### Waitng / Sleeping
+
+waiting is very simple just do
+
+```rs
+w 2
+```
+the code will wait for 2 seconds
+decimals are also supported like `2.5`
+
 ### Loops
 Loops are simple
 

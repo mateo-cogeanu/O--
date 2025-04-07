@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import time
 import re
 import sys
 
@@ -46,6 +47,10 @@ def parse(tokens, variables):
     
     elif tokens[0] == 'c':
         return ('comment')
+    
+    elif tokens[0] == 'w':
+        seconds = float(tokens[1]) 
+        return ('wait', seconds)
     
     # Exit
     elif tokens[0] == 'e':
@@ -124,9 +129,12 @@ def interpret(code, variables):
         elif action[0] == 'exit':
             sys.exit(0)
             
-        elif action[0] == 'exit':
+        elif action[0] == 'comment':
             continue
-        
+
+        elif action[0] == 'wait':
+            time.sleep(action[1]) 
+
         # List create
         elif action[0] == 'list_create':
             variables[action[1]] = [evaluate(item, variables) for item in action[2]]

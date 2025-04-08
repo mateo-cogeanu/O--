@@ -104,6 +104,8 @@ b
 ```
 
 ## Musical Note
+First thing if you ant it to be easy use the music editor.
+
 making a musical note is not as simple as just `n C`, that would play the C note right? no. this is how
 
 ```rs

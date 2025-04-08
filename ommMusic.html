@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>O-- Music Maker</title>
+  <style>
+    :root {
+      --bg-color: #1e1e1e;
+      --accent-color: #007acc;
+      --text-color: #d4d4d4;
+      --button-bg: #2d2d2d;
+      --note-hover: #007acc;
+      --note-active: #005f99;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: Consolas, monospace;
+      overflow: hidden;
+    }
+
+    h1 {
+      color: var(--accent-color);
+    }
+
+    .section-title {
+      margin-top: 30px;
+      font-size: 18px;
+      color: #ccc;
+    }
+
+    #keyboard, #waits {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 8px;
+      margin: 10px 0 20px;
+    }
+
+    .note-button, .wait-button {
+      background-color: var(--button-bg);
+      color: var(--text-color);
+      border: 1px solid #444;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.2s;
+    }
+
+    .note-button:hover, .wait-button:hover {
+      background-color: var(--note-hover);
+    }
+
+    .note-button:active, .wait-button:active {
+      background-color: var(--note-active);
+    }
+
+    button.action {
+      background-color: var(--note-hover);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin-right: 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    button.action:hover {
+      background-color: var(--note-active);
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      background-color: #2d2d2d;
+      color: var(--text-color);
+      border: 1px solid #444;
+      padding: 10px;
+      resize: none;
+      font-family: Consolas, monospace;
+      font-size: 14px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎵 O-- Music Maker</h1>
+
+  <div class="section-title">🎹 Notes</div>
+  <div id="keyboard"></div>
+
+  <div class="section-title">⏱️ Waits</div>
+  <div id="waits"></div>
+
+  <div>
+    <button class="action" onclick="clearNotes()">🗑️ Clear</button>
+    <button class="action" onclick="exportOMM()">💾 Export .omm</button>
+  </div>
+
+  <textarea id="output" readonly placeholder="Your .omm notes will appear here..."></textarea>
+
+  <script>
+    const output = document.getElementById('output');
+    const keyboard = document.getElementById('keyboard');
+    const waits = document.getElementById('waits');
+
+    const notes = [
+      { name: "C3", freq: 130 },
+      { name: "C#3 / Db3", freq: 138 },
+      { name: "D3", freq: 146 },
+      { name: "D#3 / Eb3", freq: 155 },
+      { name: "E3", freq: 164 },
+      { name: "F3", freq: 174 },
+      { name: "F#3 / Gb3", freq: 185 },
+      { name: "G3", freq: 196 },
+      { name: "G#3 / Ab3", freq: 207 },
+      { name: "A3", freq: 220 },
+      { name: "A#3 / Bb3", freq: 233 },
+      { name: "B3", freq: 246 },
+      { name: "C4", freq: 261 },
+      { name: "C#4 / Db4", freq: 277 },
+      { name: "D4", freq: 293 },
+      { name: "D#4 / Eb4", freq: 311 },
+      { name: "E4", freq: 329 },
+      { name: "F4", freq: 349 },
+      { name: "F#4 / Gb4", freq: 369 },
+      { name: "G4", freq: 392 },
+      { name: "G#4 / Ab4", freq: 415 },
+      { name: "A4", freq: 440 },
+      { name: "A#4 / Bb4", freq: 466 },
+      { name: "B4", freq: 493 },
+      { name: "C5", freq: 523 },
+      { name: "C#5 / Db5", freq: 554 },
+      { name: "D5", freq: 587 },
+      { name: "D#5 / Eb5", freq: 622 },
+      { name: "E5", freq: 659 },
+      { name: "F5", freq: 698 },
+      { name: "F#5 / Gb5", freq: 739 },
+      { name: "G5", freq: 783 },
+      { name: "G#5 / Ab5", freq: 830 },
+      { name: "A5", freq: 880 },
+      { name: "A#5 / Bb5", freq: 932 },
+      { name: "B5", freq: 987 }
+    ];
+
+    const waitsList = [0.25, 0.5, 1, 2, 4];
+
+    // Create note buttons
+    notes.forEach(note => {
+      const btn = document.createElement('div');
+      btn.className = 'note-button';
+      btn.textContent = note.name;
+      btn.onclick = () => {
+        output.value += `n ${note.freq}\n`;
+      };
+      keyboard.appendChild(btn);
+    });
+
+    // Create wait buttons
+    waitsList.forEach(time => {
+      const btn = document.createElement('div');
+      btn.className = 'wait-button';
+      btn.textContent = `${time}s`;
+      btn.onclick = () => {
+        output.value += `w ${time}\n`;
+      };
+      waits.appendChild(btn);
+    });
+
+    function clearNotes() {
+      output.value = '';
+    }
+
+    function exportOMM() {
+      if (output.value.trim() === '') {
+        alert("No notes to export!");
+        return;
+      }
+      const blob = new Blob([output.value], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'music.omm';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

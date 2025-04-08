@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import subprocess
 import time
 import re
@@ -63,6 +64,10 @@ def parse(tokens, variables):
     
     elif tokens[0] == 'b':
         return ('beep',)
+    
+    elif tokens[0] == 'n': 
+        freq = int(tokens[1]) if len(tokens) > 1 else 440
+        return ('freq_beep', freq)
     
     # List operations
     elif tokens[0] == 'a' and len(tokens) > 1 and tokens[1] == '=':
@@ -145,6 +150,9 @@ def interpret(code, variables):
         
         elif action[0] == 'beep':
             print('\a', end='', flush=True)
+        
+        elif action[0] == 'freq_beep':
+            os.system(f'play -n synth 0.1 sine {action[1]} 2>/dev/null')
         
         elif action[0] == 'terminal':
             print(f"$ {action[1]}")  # Show the command being run

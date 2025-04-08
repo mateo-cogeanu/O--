@@ -103,6 +103,14 @@ inline comments are not possible yet
 b
 ```
 
+## Musical Note
+making a musical note is not as simple as just `n C`, that would play the C note right? no. this is how
+
+```rs
+n 261
+```
+C is 261 hertz. its not that simple, but the only downside is you have to look up the hertz of every note you want to play.
+
 ### EXIT
 ```rs
 e

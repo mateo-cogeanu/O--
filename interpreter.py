@@ -56,9 +56,13 @@ def parse(tokens, variables):
     # Exit
     elif tokens[0] == 'e':
         return ('exit',)
+    
     elif tokens[0] == 't':
         cmd = ' '.join(tokens[1:])
         return ('terminal', cmd)
+    
+    elif tokens[0] == 'b':
+        return ('beep',)
     
     # List operations
     elif tokens[0] == 'a' and len(tokens) > 1 and tokens[1] == '=':
@@ -138,6 +142,9 @@ def interpret(code, variables):
 
         elif action[0] == 'wait':
             time.sleep(action[1]) 
+        
+        elif action[0] == 'beep':
+            print('\a', end='', flush=True)
         
         elif action[0] == 'terminal':
             print(f"$ {action[1]}")  # Show the command being run

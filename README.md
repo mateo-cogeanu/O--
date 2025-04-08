@@ -98,6 +98,11 @@ c comment
 ```
 inline comments are not possible yet
 
+### Boop
+```rs
+b
+```
+
 ### EXIT
 ```rs
 e

@@ -104,7 +104,7 @@ b
 ```
 
 ## Musical Note
-First thing if you ant it to be easy use the music editor.
+First thing, if you want it to be easy use the music editor.
 
 making a musical note is not as simple as just `n C4`, that would play the C4 note right? no. this is how
 

@@ -34,7 +34,7 @@ Math is also very easy
 x = 1
 p x + 1
 ```
-other symbols work aswell `+,-,/`
+other symbols work aswell `+,-,/,*`
 
 ### If statement's
 these are very easy

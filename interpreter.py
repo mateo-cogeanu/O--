@@ -197,8 +197,9 @@ def interpret(code, variables):
 
         elif action[0] == 'brain':
             input_text = action[1]
-            brain.learn(input_text)
-            print("Brain:", brain.respond(input_text))
+            if not input_text.startswith('_'):
+                print("Brain:", brain.respond(input_text))
+            brain.learn(input_text.lstrip('_'))
         
         elif action[0] == 'terminal':
             print(f"$ {action[1]}")  # Show the command being run

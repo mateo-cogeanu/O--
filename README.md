@@ -118,10 +118,11 @@ You can make simple neural networks in `O--`
 `k` is for knowledge
 
 ```rs
-k dogs say woof
+k _dogs say woof
 k dogs say
 ```
 it will output `woof`
+the underscore is for silent. meaning it will not output
 
 ### EXIT
 ```rs

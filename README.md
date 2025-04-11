@@ -121,7 +121,7 @@ You can make simple neural networks in `O--`
 k _dogs say woof
 k dogs say
 ```
-it will output `woof`
+it will output `woof`. 
 the underscore is for silent. meaning it will not output
 
 ### EXIT

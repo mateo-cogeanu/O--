@@ -113,6 +113,16 @@ n 261
 ```
 C4 note is 261 hertz. its not that simple, but the only downside is you have to look up the hertz of every note you want to play.
 
+### Neural networks
+You can make simple neural networks in `O--`
+`k` is for knowledge
+
+```rs
+k dogs say woof
+k dogs say
+```
+it will output `woof`
+
 ### EXIT
 ```rs
 e

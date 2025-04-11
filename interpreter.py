@@ -1,9 +1,47 @@
 #!/usr/bin/env python3
+import random
+from collections import defaultdict
 import os
 import subprocess
 import time
 import re
 import sys
+
+class MiniBrain:
+    def __init__(self):
+        self.memory = defaultdict(list)  # {pattern: [responses]}
+        self.triggers = defaultdict(int) # {phrase: count}
+    
+    def learn(self, input_text):
+        words = input_text.lower().split()
+        self.triggers[' '.join(words)] += 1
+        
+        # Store word sequences
+        for i in range(len(words)-1):
+            pattern = ' '.join(words[:i+1])
+            response = words[i+1]
+            self.memory[pattern].append(response)
+    
+    def respond(self, input_text):
+        words = input_text.lower().split()
+        for i in reversed(range(len(words))):
+            pattern = ' '.join(words[:i+1])
+            if pattern in self.memory:
+                return random.choice(self.memory[pattern])
+        return random.choice(["Hmm", "Interesting", "Tell me more"])
+    
+    def save(self, filename="brain.mem"):
+        with open(filename, 'w') as f:
+            f.write(str(dict(self.memory)))
+
+    def load(self, filename="brain.mem"):
+        try:
+            with open(filename) as f:
+                self.memory = eval(f.read())
+        except:
+            self.memory = defaultdict(list)
+
+brain = MiniBrain()
 
 def lex(code):
     return re.findall(r'"[^"]*"|\S+', code)
@@ -54,6 +92,9 @@ def parse(tokens, variables):
         seconds = float(tokens[1]) 
         return ('wait', seconds)
     
+    elif tokens[0] == 'k':
+        return ('brain', ' '.join(tokens[1:]))
+
     # Exit
     elif tokens[0] == 'e':
         return ('exit',)
@@ -153,6 +194,11 @@ def interpret(code, variables):
         
         elif action[0] == 'freq_beep':
             os.system(f'play -n synth 0.1 sine {action[1]} 2>/dev/null')
+
+        elif action[0] == 'brain':
+            input_text = action[1]
+            brain.learn(input_text)
+            print("Brain:", brain.respond(input_text))
         
         elif action[0] == 'terminal':
             print(f"$ {action[1]}")  # Show the command being run

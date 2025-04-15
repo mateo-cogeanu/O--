@@ -1,5 +1,10 @@
 # O-- the simplest programming language i know
 
+
+## Get certified
+https://mateo-cogeanu.github.io/o--_cert/index.html
+
+### Runing code
 Run code with
 
 ```bash

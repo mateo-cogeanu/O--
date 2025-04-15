@@ -95,6 +95,18 @@ t python --version
 ```
 `t` stands for TERMINAL
 
+### GAMES
+```rs
+c Setup
+g init 800 600
+
+c Player (press SPACE to jump)
+g box 100 550 50 50 255 255 255
+
+c Run
+g run
+```
+
 ### Comments
 comments are `VERY` simple
 

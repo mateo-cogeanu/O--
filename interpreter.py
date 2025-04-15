@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import pygame  # type: ignore
 import random
 from collections import defaultdict
 import os
@@ -6,6 +7,66 @@ import subprocess
 import time
 import re
 import sys
+
+class GameEngine:
+    def __init__(self):
+        self.screen = None
+        self.objects = []
+        self.running = False
+        self.clock = pygame.time.Clock()
+    
+    def init(self, width, height):
+        self.screen = pygame.display.set_mode((width, height))
+        self.running = True
+        print(f"Game ready! {width}x{height}")
+    
+    def add_box(self, x, y, w, h, color):
+        self.objects.append({
+            'type': 'box',
+            'x': x, 'y': y,
+            'w': w, 'h': h,
+            'color': color,
+            'vel_y': 0
+        })
+    
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+        
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            self.objects[0]['vel_y'] = -15  # Jump
+    
+    def update(self):
+        for obj in self.objects:
+            obj['vel_y'] += 0.5  # Gravity
+            obj['y'] += obj['vel_y']
+            
+            # Floor collision
+            if obj['y'] > 550:
+                obj['y'] = 550
+                obj['vel_y'] = 0
+    
+    def draw(self):
+        self.screen.fill((0, 0, 0))
+        for obj in self.objects:
+            pygame.draw.rect(
+                self.screen,
+                obj['color'],
+                (obj['x'], obj['y'], obj['w'], obj['h'])
+            )
+        pygame.display.flip()
+    
+    def run(self):
+        while self.running:
+            self.handle_events()
+            self.update()
+            self.draw()
+            self.clock.tick(60)
+        pygame.quit()
+
+game_engine = GameEngine()
 
 class MiniBrain:
     def __init__(self):
@@ -94,6 +155,11 @@ def parse(tokens, variables):
     
     elif tokens[0] == 'k':
         return ('brain', ' '.join(tokens[1:]))
+    
+    elif tokens[0] == 'g':
+        if len(tokens) < 2:
+            return ('game_help',)
+        return ('game', tokens[1], tokens[2:])
 
     # Exit
     elif tokens[0] == 'e':
@@ -213,6 +279,25 @@ def interpret(code, variables):
             for line in process.stdout:
                 print(line, end='')  # Print output in real-time
             process.wait()
+        
+        elif action[0] == 'game':
+            cmd = action[1]
+            args = action[2]
+    
+            if cmd == 'init':
+                game_engine.init(int(args[0]), int(args[1]))
+    
+            elif cmd == 'box':
+                color = (int(args[4]), int(args[5]), int(args[6]))
+                game_engine.add_box(
+                    float(args[0]), float(args[1]),
+                    float(args[2]), float(args[3]),
+                    color
+                )
+    
+            elif cmd == 'run':
+                game_engine.run()
+
 
         # List create
         elif action[0] == 'list_create':

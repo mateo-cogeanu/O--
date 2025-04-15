@@ -2,6 +2,7 @@
 
 
 ## [Get certified!](https://mateo-cogeanu.github.io/o--_cert/)
+it only takes a few seconds
 
 ### Runing code
 Run code with

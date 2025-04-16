@@ -8,6 +8,52 @@ import time
 import re
 import sys
 
+class GloopManager:
+    def __init__(self):
+        self.loaded_files = {}
+    
+    def parse_glop(self, filename):
+        """Parse a .glop file into a dictionary"""
+        data = {}
+        try:
+            with open(filename) as f:
+                for line in f:
+                    line = line.strip()
+                    if line and ':' in line:
+                        key, value = line.split(':', 1)
+                        data[key.strip()] = self._convert_value(value.strip())
+            return data
+        except FileNotFoundError:
+            print(f"Gloop file {filename} not found")
+            return None
+    
+    def _convert_value(self, value):
+        """Convert string values to proper types"""
+        value = value.strip('"\'')  # Remove surrounding quotes
+        
+        # Type conversion
+        if value.lower() == 'true': return True
+        if value.lower() == 'false': return False
+        if value.isdigit(): return int(value)
+        try: return float(value)
+        except ValueError: return value
+    
+    def import_file(self, filename):
+        """Load .glop file into memory"""
+        data = self.parse_glop(filename)
+        if data:
+            self.loaded_files[filename] = data
+            return True
+        return False
+    
+    def get_value(self, filename, key):
+        """Get value from loaded .glop file"""
+        if filename in self.loaded_files:
+            return self.loaded_files[filename].get(key)
+        return None
+
+gloop_manager = GloopManager()
+
 class GameEngine:
     def __init__(self):
         self.screen = None
@@ -160,6 +206,11 @@ def parse(tokens, variables):
         if len(tokens) < 2:
             return ('game_help',)
         return ('game', tokens[1], tokens[2:])
+    
+    elif tokens[0] == 'gl':
+        if len(tokens) < 3:
+            raise SyntaxError("Usage: gl <i|v> <file.glop> [key]")
+        return ('gloop', tokens[1], tokens[2], tokens[3] if len(tokens) > 3 else None)
 
     # Exit
     elif tokens[0] == 'e':
@@ -297,6 +348,22 @@ def interpret(code, variables):
     
             elif cmd == 'run':
                 game_engine.run()
+        
+        elif action[0] == 'gloop':
+            cmd, filename, arg = action[1], action[2], action[3]
+    
+            if not filename.endswith('.glop'):
+                filename += '.glop'
+    
+            if cmd == 'i':  # Import
+                if gloop_manager.import_file(filename):
+                    for k, v in gloop_manager.loaded_files[filename].items():
+                        variables[k] = v
+                    print(f"Imported {filename}")
+    
+            elif cmd == 'v':  # View value
+                value = gloop_manager.get_value(filename, arg)
+                print(value if value is not None else f"Key '{arg}' not found")
 
 
         # List create

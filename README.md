@@ -121,6 +121,20 @@ inline comments are not possible yet
 b
 ```
 
+### Gloop "Generalized Logic-Oriented Object Protocol"
+Gloop is basicly json but better
+
+```rs
+burger: "5 usd"
+fries: "3 usd"
+```
+and in the `O--` code is
+```rs
+gl i prices.glop
+p burger
+```
+and the output will be `5 usd`
+
 ## Musical Note
 First thing, if you want it to be easy use the music editor.
 

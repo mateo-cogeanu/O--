@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>O-- Game Engine Editor</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #1e1e1e;
+      color: #fff;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #setup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    #setup input, #setup button {
+      margin: 10px;
+      padding: 10px 15px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
+    #setup button:hover, input[type="file"]::file-selector-button:hover {
+      background: #555;
+      cursor: pointer;
+    }
+
+    #sidebar {
+      width: 250px;
+      background: #2d2d2d;
+      padding: 20px;
+      border-right: 2px solid #444;
+      display: none;
+      flex-direction: column;
+    }
+    #main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    canvas {
+      border: 2px solid #444;
+      background: #000;
+      cursor: grab;
+    }
+    input, button {
+      width: 100%;
+      margin: 5px 0;
+      padding: 8px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
+    input[type="file"] {
+      padding: 0;
+    }
+    label { font-size: 12px; margin-top: 10px; display: block; }
+    .section { margin-bottom: 20px; }
+    #editBox { display: none; }
+  </style>
+</head>
+<body>
+
+<div id="setup">
+  <h2>Start a New Scene or Import</h2>
+  <input type="number" id="width" value="800"> Width<br>
+  <input type="number" id="height" value="600"> Height<br>
+  <button onclick="startEditor()">Start New Scene</button><br><br>
+  <input type="file" id="fileInputStart" accept=".omm" onchange="importOMM(true)">
+</div>
+
+<div id="sidebar">
+  <div class="section">
+    <button onclick="addBox()">+ Add Box</button>
+    <button onclick="downloadOMM()">Download .omm</button>
+  </div>
+
+  <div id="editBox" class="section">
+    <label>Width</label>
+    <input type="number" id="editW">
+    <label>Height</label>
+    <input type="number" id="editH">
+    <label>Red</label>
+    <input type="number" id="editR" min="0" max="255">
+    <label>Green</label>
+    <input type="number" id="editG" min="0" max="255">
+    <label>Blue</label>
+    <input type="number" id="editB" min="0" max="255">
+    <button onclick="updateBox()">Update</button>
+  </div>
+</div>
+
+<div id="main">
+  <canvas id="canvas" style="display:none;"></canvas>
+</div>
+
+<script>
+let canvas, ctx;
+let canvasW = 800, canvasH = 600;
+let objects = [];
+let selected = null;
+let dragging = false;
+let offsetX = 0, offsetY = 0;
+
+function startEditor() {
+  canvasW = parseInt(document.getElementById('width').value);
+  canvasH = parseInt(document.getElementById('height').value);
+  showEditor();
+  draw();
+}
+
+function showEditor() {
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('sidebar').style.display = 'flex';
+
+  canvas = document.getElementById('canvas');
+  ctx = canvas.getContext('2d');
+  canvas.width = canvasW;
+  canvas.height = canvasH;
+  canvas.style.display = 'block';
+
+  canvas.addEventListener('mousedown', startDrag);
+  canvas.addEventListener('mousemove', drag);
+  canvas.addEventListener('mouseup', endDrag);
+}
+
+function addBox() {
+  const box = { x: 100, y: 100, w: 50, h: 50, r: 255, g: 0, b: 0 };
+  objects.push(box);
+  selectBox(objects.length - 1);
+}
+
+function selectBox(index) {
+  selected = index;
+  const o = objects[index];
+  document.getElementById('editBox').style.display = 'block';
+  document.getElementById('editW').value = o.w;
+  document.getElementById('editH').value = o.h;
+  document.getElementById('editR').value = o.r;
+  document.getElementById('editG').value = o.g;
+  document.getElementById('editB').value = o.b;
+  draw();
+}
+
+function updateBox() {
+  const o = objects[selected];
+  o.w = parseInt(document.getElementById('editW').value);
+  o.h = parseInt(document.getElementById('editH').value);
+  o.r = parseInt(document.getElementById('editR').value);
+  o.g = parseInt(document.getElementById('editG').value);
+  o.b = parseInt(document.getElementById('editB').value);
+  draw();
+}
+
+function startDrag(e) {
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+
+  for (let i = objects.length - 1; i >= 0; i--) {
+    const o = objects[i];
+    if (mouseX >= o.x && mouseX <= o.x + o.w && mouseY >= o.y && mouseY <= o.y + o.h) {
+      selected = i;
+      offsetX = mouseX - o.x;
+      offsetY = mouseY - o.y;
+      dragging = true;
+      selectBox(i);
+      return;
+    }
+  }
+
+  selected = null;
+  document.getElementById('editBox').style.display = 'none';
+  draw();
+}
+
+function drag(e) {
+  if (dragging && selected !== null) {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const o = objects[selected];
+    o.x = mouseX - offsetX;
+    o.y = mouseY - offsetY;
+    draw();
+  }
+}
+
+function endDrag() {
+  dragging = false;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  objects.forEach((o, i) => {
+    ctx.fillStyle = `rgb(${o.r}, ${o.g}, ${o.b})`;
+    ctx.fillRect(o.x, o.y, o.w, o.h);
+    if (i === selected) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(o.x, o.y, o.w, o.h);
+    }
+  });
+}
+
+function downloadOMM() {
+  let code = `g init ${canvasW} ${canvasH}\n`;
+  objects.forEach(o => {
+    code += `g box ${Math.round(o.x)} ${Math.round(o.y)} ${o.w} ${o.h} ${o.r} ${o.g} ${o.b}\n`;
+  });
+  code += `g run\n`;
+
+  const blob = new Blob([code], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'scene.omm';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importOMM(fromStart) {
+  const input = fromStart ? document.getElementById('fileInputStart') : document.getElementById('fileInput');
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const lines = e.target.result.split('\n');
+    objects = [];
+
+    lines.forEach(line => {
+      const parts = line.trim().split(' ');
+      if (parts[0] === 'g' && parts[1] === 'init') {
+        canvasW = parseInt(parts[2]);
+        canvasH = parseInt(parts[3]);
+      } else if (parts[0] === 'g' && parts[1] === 'box') {
+        const [, , x, y, w, h, r, g, b] = parts;
+        objects.push({
+          x: parseInt(x), y: parseInt(y), w: parseInt(w), h: parseInt(h),
+          r: parseInt(r), g: parseInt(g), b: parseInt(b)
+        });
+      }
+    });
+
+    showEditor();
+    draw();
+  };
+
+  reader.readAsText(file);
+}
+</script>
+
+</body>
+</html>

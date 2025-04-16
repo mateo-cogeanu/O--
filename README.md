@@ -96,6 +96,7 @@ t python --version
 `t` stands for TERMINAL
 
 ### GAMES
+if you don't want to be tortured while making games in `O--` use the editor
 ```rs
 c Setup
 g init 800 600

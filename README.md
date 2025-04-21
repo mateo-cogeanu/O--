@@ -172,6 +172,11 @@ k dogs say
 it will output `woof`. 
 the underscore is for silent. meaning it will not output
 
+### Mandelbrot
+```rs
+ma 800 600 100
+```
+
 ### EXIT
 ```rs
 e

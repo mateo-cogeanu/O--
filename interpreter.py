@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import matplotlib # type: ignore
 import pygame  # type: ignore
 import random
 from collections import defaultdict
@@ -150,6 +151,27 @@ class MiniBrain:
 
 brain = MiniBrain()
 
+def mandelbrot(width, height, max_iter):
+    import numpy as np # type: ignore
+    x_min, x_max = -2.0, 1.0
+    y_min, y_max = -1.5, 1.5
+    image = np.zeros((height, width))
+
+    for row in range(height):
+        for col in range(width):
+            # Map pixel position to a point in the complex plane
+            x = x_min + (x_max - x_min) * col / width
+            y = y_min + (y_max - y_min) * row / height
+            c = complex(x, y)
+            z = 0
+            for iteration in range(max_iter):
+                if abs(z) > 2:
+                    break
+                z = z * z + c
+            image[row, col] = iteration
+
+    return image
+
 def lex(code):
     return re.findall(r'"[^"]*"|\S+', code)
 
@@ -214,6 +236,14 @@ def parse(tokens, variables):
     
     elif tokens[0] == 'im':
         return ('import', tokens[1])
+    
+    elif tokens[0] == 'ma':
+        if len(tokens) < 4:
+            raise SyntaxError("Usage: ma w h m")
+        w = int(tokens[1])
+        h = int(tokens[2])
+        m = int(tokens[3])
+        return ('mandelbrot', w, h, m)
 
     # Exit
     elif tokens[0] == 'e':
@@ -379,6 +409,16 @@ def interpret(code, variables):
                     print(f"Imported {filename}")
                 except FileNotFoundError:
                         print(f"Error: File '{filename}' not found")
+        
+        elif action[0] == 'mandelbrot':
+            import matplotlib.pyplot as plt # type: ignore
+            width, height, max_iter = action[1], action[2], action[3]
+            print(f"Generating Mandelbrot set ({width}x{height}, {max_iter} iterations)")
+            image = mandelbrot(width, height, max_iter)
+            plt.imshow(image, extent=(-2, 1, -1.5, 1.5), cmap='hot', interpolation='bilinear')
+            plt.colorbar()
+            plt.title("Mandelbrot Set")
+            plt.show()
 
 
         # List create

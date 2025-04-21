@@ -244,6 +244,13 @@ def parse(tokens, variables):
         h = int(tokens[2])
         m = int(tokens[3])
         return ('mandelbrot', w, h, m)
+    
+    elif tokens[0] == 'u':
+        if len(tokens) < 3:
+           raise SyntaxError("Usage: u variable_name 'Prompt message'")
+        var_name = tokens[1]
+        prompt = ' '.join(tokens[2:]).strip('"')
+        return ('user_input', var_name, prompt)
 
     # Exit
     elif tokens[0] == 'e':
@@ -419,7 +426,11 @@ def interpret(code, variables):
             plt.colorbar()
             plt.title("Mandelbrot Set")
             plt.show()
-
+        
+        elif action[0] == 'user_input':
+            var_name, prompt = action[1], action[2]
+            user_value = input(prompt + ' ')
+            variables[var_name] = user_value
 
         # List create
         elif action[0] == 'list_create':

@@ -41,6 +41,12 @@ p x + 1
 ```
 other symbols work aswell `+,-,/,*`
 
+### User Input
+```rs
+u x "what is your name:"
+p x
+```
+
 ### If statement's
 these are very easy
 

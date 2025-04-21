@@ -211,6 +211,9 @@ def parse(tokens, variables):
         if len(tokens) < 3:
             raise SyntaxError("Usage: gl <i|v> <file.glop> [key]")
         return ('gloop', tokens[1], tokens[2], tokens[3] if len(tokens) > 3 else None)
+    
+    elif tokens[0] == 'im':
+        return ('import', tokens[1])
 
     # Exit
     elif tokens[0] == 'e':
@@ -364,6 +367,18 @@ def interpret(code, variables):
             elif cmd == 'v':  # View value
                 value = gloop_manager.get_value(filename, arg)
                 print(value if value is not None else f"Key '{arg}' not found")
+        
+        elif action[0] == 'import':
+                filename = action[1]
+                if not filename.endswith('.omm'):
+                    filename += '.omm'
+                try:
+                    with open(filename, 'r') as file:
+                        imported_code = file.read()
+                    interpret(imported_code, variables)
+                    print(f"Imported {filename}")
+                except FileNotFoundError:
+                        print(f"Error: File '{filename}' not found")
 
 
         # List create

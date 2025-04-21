@@ -63,6 +63,22 @@ output
 function
 ```
 
+### File Importing
+file importing will import `brain knowledge`, `functions` and `variables`
+```rs
+im code.omm
+k dogs say
+func
+p x
+```
+
+in `code.omm`
+```rs
+_dogs say woof
+f func { p "hello" }
+x = 1
+``` 
+
 ### Waitng / Sleeping
 
 waiting is very simple just do

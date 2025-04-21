@@ -1,18 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>O-- IDE</title>
+  <meta charset="UTF-8">
+  <title>O-- IDE with GLOOP</title>
   <style>
     body {
       margin: 0;
       background: #1e1e1e;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+
+    #tabbar {
+      display: flex;
+      background: #1e1e1e;
+      padding-left: 10px;
+      border-bottom: 1px solid #333;
+    }
+
+    .tabBtn {
+      position: relative;
+      background: transparent;
+      border: none;
+      color: #ccc;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: color 0.2s ease-in-out;
+    }
+
+    .tabBtn:hover {
+      color: #fff;
+    }
+
+    .tabBtn.active {
+      color: white;
+    }
+
+    .tabBtn.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 100%;
+      background-color: #007acc;
     }
 
     #toolbar {
       background: #252526;
-      padding: 8px 12px;
+      padding: 6px 12px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -23,10 +60,10 @@
       background: #1e1e1e;
       color: white;
       border: 1px solid #3c3c3c;
-      padding: 6px 10px;
+      padding: 4px 8px;
       border-radius: 3px;
-      font-size: 14px;
-      width: 200px;
+      font-size: 13px;
+      width: 180px;
     }
 
     #filenameInput:focus {
@@ -38,8 +75,8 @@
       background-color: #0e639c;
       color: white;
       border: none;
-      padding: 6px 14px;
-      font-size: 14px;
+      padding: 5px 12px;
+      font-size: 13px;
       border-radius: 2px;
       cursor: pointer;
       transition: background-color 0.2s ease-in-out;
@@ -49,41 +86,75 @@
       background-color: #1177bb;
     }
 
-    #editor {
+    #editor, #gloopEditor {
       width: 100vw;
-      height: calc(100vh - 50px);
+      height: calc(100vh - 82px);
+      display: none;
     }
   </style>
 </head>
 <body>
 
+  <div id="tabbar">
+    <button class="tabBtn active" onclick="showTab('editor')">O-- Code</button>
+    <button class="tabBtn" onclick="showTab('gloop')">GLOOP</button>
+  </div>
+
   <div id="toolbar">
     <input id="filenameInput" type="text" placeholder="Filename" value="code.omm" />
-    <button id="saveBtn">Save</button>
+    <button id="saveBtn">💾 Save</button>
   </div>
 
   <div id="editor"></div>
+  <div id="gloopEditor"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
   <script>
+    let editor, gloopEditor;
+    let currentTab = 'editor';
+
+    function showTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tabBtn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+      document.getElementById('editor').style.display = (tabId === 'editor') ? 'block' : 'none';
+      document.getElementById('gloopEditor').style.display = (tabId === 'gloop') ? 'block' : 'none';
+
+      // Update filename placeholder
+      const filenameInput = document.getElementById('filenameInput');
+      if (tabId === 'editor') {
+        if (!filenameInput.value.endsWith('.omm')) filenameInput.value = 'code.omm';
+      } else {
+        if (!filenameInput.value.endsWith('.glop')) filenameInput.value = 'data.glop';
+      }
+    }
+
     require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
 
     require(['vs/editor/editor.main'], function () {
       monaco.languages.register({ id: 'o--' });
-
       monaco.languages.setMonarchTokensProvider('o--', {
         tokenizer: {
           root: [
-            [/^\s*c.*$/, 'comment'],
+            [/^\s*c\s+.*$/, 'comment'],
             [/\b(p|i|l|e|f|w|t|b|n|k|g|gl|im|ma|u)\b/, 'keyword'],
-            [/[+\-\/=\*]/, 'operator'],
+            [/[+\-\/=]/, 'operator'],
             [/\".*?\"/, 'string'],
-            [/[a-zA-Z_][\w\-]*/, 'identifier'],
             [/\b\d+(\.\d+)?\b/, 'number'],
             [/\{/, 'braceblock'],
             [/\}/, 'braceblock2'],
+            [/[a-zA-Z_][\w\-]*/, 'identifier'],
+          ]
+        }
+      });
 
-
+      monaco.languages.register({ id: 'gloop' });
+      monaco.languages.setMonarchTokensProvider('gloop', {
+        tokenizer: {
+          root: [
+            [/[a-zA-Z_][\w\-]*\s*:/, 'key'],
+            [/\".*?\"/, 'string'],
+            [/\b\d+(\.\d+)?\b/, 'number'],
           ]
         }
       });
@@ -92,38 +163,56 @@
         base: 'vs-dark',
         inherit: true,
         rules: [
-          { token: 'comment', foreground: '999595', fontStyle: 'italic' },
-          { token: 'keyword', foreground: '569CD6' },    // blue
-          { token: 'operator', foreground: 'FF4C4C' },    // red
-          { token: 'string', foreground: 'CE9178' },      //orange
-          { token: 'identifier', foreground: 'C586C0' },
+          { token: 'keyword', foreground: '569CD6' },
+          { token: 'operator', foreground: 'F44747' },
+          { token: 'string', foreground: 'CE9178' },
           { token: 'number', foreground: 'CE9178' },
-          { token: 'braceblock', foreground: 'DCDCAA' },
-          { token: 'braceblock2', foreground: 'DCDCAA' },
-   
-
+          { token: 'braceblock', foreground: 'FFD700' },
+          { token: 'braceblock2', foreground: 'FFD700' },
+          { token: 'identifier', foreground: 'C586C0' },
+          { token: 'comment', foreground: '808080', fontStyle: 'italic' },
+          { token: 'key', foreground: '4FC1FF' }
         ],
-        colors: {}
+        colors: {
+          'editor.background': '#1e1e1e'
+        }
       });
 
-      const editor = monaco.editor.create(document.getElementById('editor'), {
-        value: ``,
+      editor = monaco.editor.create(document.getElementById('editor'), {
+        value: `p "hello, world!"\n`,
         language: 'o--',
         theme: 'o--theme',
+        fontSize: 15,
         automaticLayout: true
       });
 
+      gloopEditor = monaco.editor.create(document.getElementById('gloopEditor'), {
+        value: `burger: "5 usd"\nfries: "3 usd"`,
+        language: 'gloop',
+        theme: 'o--theme',
+        fontSize: 15,
+        automaticLayout: true
+      });
+
+      document.getElementById('editor').style.display = 'block';
+
       document.getElementById('saveBtn').addEventListener('click', () => {
-        let fileName = document.getElementById('filenameInput').value.trim();
-        if (!fileName.toLowerCase().endsWith('.omm')) {
-          fileName += '.omm';
+        const input = document.getElementById('filenameInput');
+        let filename = input.value.trim();
+        let content;
+
+        if (currentTab === 'editor') {
+          if (!filename.toLowerCase().endsWith('.omm')) filename += '.omm';
+          content = editor.getValue();
+        } else {
+          if (!filename.toLowerCase().endsWith('.glop')) filename += '.glop';
+          content = gloopEditor.getValue();
         }
 
-        const code = editor.getValue();
-        const blob = new Blob([code], { type: 'text/plain' });
+        const blob = new Blob([content], { type: 'text/plain' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = fileName;
+        a.download = filename;
         a.click();
         URL.revokeObjectURL(a.href);
       });
